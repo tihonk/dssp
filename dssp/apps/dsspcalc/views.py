@@ -1,11 +1,13 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from types import SimpleNamespace
-import json
+import re
 
 
 @csrf_exempt
 def dsspcalc(request):
+
     if request.method == 'POST':
-        json_object = json.loads(request.body, object_hook=lambda d: SimpleNamespace(**d))
-    return HttpResponse(json_object.value)
+        pdb_file_content = request.FILES['pdbFile'].read().decode('UTF-8')
+        full_atom_coordinates = re.findall(r'ATOM(.*)\n', pdb_file_content)
+        chain = request.POST['chain']
+    return HttpResponse(pdb_file_content)
